@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ptc
+      POSTGRES_PASSWORD: ptc_dev_password
+      POSTGRES_DB: ptc_creative
+    ports:
+      - "5432:5432"
+    volumes:
+      - ptc_pg_data:/var/lib/postgresql/data
+
+volumes:
+  ptc_pg_data:
