@@ -9,6 +9,21 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { LucideIcon } from "lucide-react";
+import {
+  BookOpen,
+  Boxes,
+  CircleHelp,
+  Factory,
+  Home,
+  Images,
+  Layers,
+  Mail,
+  Newspaper,
+  Rocket,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type HomeTheme =
@@ -26,7 +41,7 @@ export type HomeTheme =
   | "cta";
 
 const THEME_LABEL: Record<HomeTheme, { vi: string; de: string }> = {
-  hero: { vi: "Banner", de: "Banner" },
+  hero: { vi: "Home", de: "Home" },
   story: { vi: "Câu chuyện", de: "Story" },
   team: { vi: "Nhân sự", de: "Team" },
   process: { vi: "Quy trình", de: "Prozess" },
@@ -37,7 +52,23 @@ const THEME_LABEL: Record<HomeTheme, { vi: string; de: string }> = {
   blog: { vi: "Blog", de: "Blog" },
   faq: { vi: "FAQ", de: "FAQ" },
   contact: { vi: "Liên hệ", de: "Kontakt" },
-  cta: { vi: "CTA", de: "CTA" },
+  cta: { vi: "Bắt đầu", de: "Start" },
+};
+
+/** Tech rail icons per section */
+const THEME_ICON: Record<HomeTheme, LucideIcon> = {
+  hero: Home,
+  story: BookOpen,
+  team: Users,
+  process: Factory,
+  services: Layers,
+  solutions: Boxes,
+  portfolio: Images,
+  pricing: Wallet,
+  blog: Newspaper,
+  faq: CircleHelp,
+  contact: Mail,
+  cta: Rocket,
 };
 
 const WHEEL_LOCK_MS = 900;
@@ -331,26 +362,55 @@ export function HomeSnapRoot({
         {children}
       </div>
 
+      {/* Left tech rail — home + section icons */}
       <nav
-        className="home-snap-dots"
-        aria-label={locale === "de" ? "Abschnitte" : "Các section"}
+        className="home-snap-rail"
+        aria-label={locale === "de" ? "Navigation Abschnitte" : "Menu section"}
       >
-        {sections.map((s, i) => {
-          const label = THEME_LABEL[s.theme][locale];
-          return (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => go(s.id)}
-              className={cn("home-snap-dot", active === i && "is-active")}
-              aria-label={label}
-              aria-current={active === i ? "true" : undefined}
-              title={label}
-            >
-              <span className="home-snap-dot__label">{label}</span>
-            </button>
-          );
-        })}
+        <div className="home-snap-rail__track" aria-hidden>
+          <span
+            className="home-snap-rail__progress"
+            style={{
+              height: `${count > 1 ? (active / (count - 1)) * 100 : 0}%`,
+            }}
+          />
+        </div>
+
+        <div className="home-snap-rail__list">
+          {sections.map((s, i) => {
+            const label = THEME_LABEL[s.theme][locale];
+            const Icon = THEME_ICON[s.theme] ?? Home;
+            const on = active === i;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => go(s.id)}
+                className={cn("home-snap-rail__btn", on && "is-active")}
+                aria-label={label}
+                aria-current={on ? "true" : undefined}
+                title={label}
+              >
+                <span className="home-snap-rail__icon" aria-hidden>
+                  <Icon className="h-3.5 w-3.5" strokeWidth={on ? 2.25 : 1.75} />
+                </span>
+                <span className="home-snap-rail__tip">
+                  <span className="home-snap-rail__tip-idx">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {label}
+                </span>
+                {on && <span className="home-snap-rail__pulse" aria-hidden />}
+              </button>
+            );
+          })}
+        </div>
+
+        <span className="home-snap-rail__meta" aria-hidden>
+          {String(active + 1).padStart(2, "0")}
+          <span>/</span>
+          {String(count).padStart(2, "0")}
+        </span>
       </nav>
     </div>
   );

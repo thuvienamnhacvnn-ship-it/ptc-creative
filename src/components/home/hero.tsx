@@ -25,7 +25,7 @@ import {
   BANNER_SLIDES,
   type BannerSlide,
 } from "@/data/banner-slides";
-import { EcgWaves } from "@/components/home/ecg-waves";
+import { BannerFx } from "@/components/home/banner-fx";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const SLIDE_MS = 7000;
@@ -391,7 +391,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           </div>
         </div>
 
-        <EcgWaves reduceMotion={reduce} locale={locale} />
+        <BannerFx reduceMotion={reduce} locale={locale} />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[45] h-px bg-gradient-to-r from-transparent via-accent/55 to-transparent" />
       </div>

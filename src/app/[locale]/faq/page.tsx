@@ -62,7 +62,9 @@ export default async function FaqPage({
         subtitle={dict.faq.subtitle}
       />
       <Section>
-        <FaqAccordion locale={locale} />
+        <div className="mx-auto max-w-3xl">
+          <FaqAccordion locale={locale} variant="page" />
+        </div>
       </Section>
       <CtaBanner
         locale={locale}

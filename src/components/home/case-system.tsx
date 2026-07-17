@@ -5,44 +5,57 @@ import {
   useEffect,
   useMemo,
   useState,
+  type CSSProperties,
 } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   Clock3,
+  Layers,
   Pause,
   Play,
   Sparkles,
 } from "lucide-react";
-import type { Locale, PortfolioCategory } from "@/types";
+import type { Locale, PortfolioCategory, PortfolioItem } from "@/types";
 import type { Dictionary } from "@/i18n/dictionaries/vi";
 import { portfolio } from "@/data/portfolio";
 import { localePath, t, cn } from "@/lib/utils";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 
-const ease = [0.22, 1, 0.36, 1] as const;
-const HOLD_MS = 5500;
+/** Soft ease-out for image crossfades */
+const fadeEase = [0.33, 1, 0.68, 1] as const;
+const HOLD_MS = 6000;
+const FADE_MS = 0.62;
+
+const CAT_COLOR: Record<PortfolioCategory | "all", string> = {
+  all: "#ff4d6d",
+  website: "#38bdf8",
+  cnc: "#a3e635",
+  print: "#fbbf24",
+  signage: "#c084fc",
+};
 
 const CATEGORIES: {
   key: "all" | PortfolioCategory;
   label: { vi: string; de: string };
 }[] = [
   { key: "all", label: { vi: "Tất cả", de: "Alle" } },
-  { key: "website", label: { vi: "Website", de: "Website" } },
+  { key: "website", label: { vi: "Web", de: "Web" } },
   { key: "cnc", label: { vi: "CNC", de: "CNC" } },
   { key: "print", label: { vi: "Print", de: "Print" } },
   { key: "signage", label: { vi: "Signage", de: "Signage" } },
 ];
 
 /**
- * Portfolio — Kinetic Deck
- * · Media full-bleed + glass HUD
- * · Auto-play / pause · prev-next
- * · Filmstrip case động, cân đều
+ * Portfolio — ATELIER FRAME
+ * Layout độc đáo:
+ * · Spine film dọc (trái) — chọn case
+ * · Khung media cắt chéo + layer stack 3D
+ * · Dossier card nổi (phải / dưới)
+ * · Palette rose × lime × violet — khác hẳn section khác
  */
 export function CaseSystem({
   locale,
@@ -56,7 +69,7 @@ export function CaseSystem({
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [tick, setTick] = useState(0);
-  const [dir, setDir] = useState(1);
+  const [dir, setDir] = useState<1 | -1>(1);
 
   const items = useMemo(
     () =>
@@ -67,12 +80,24 @@ export function CaseSystem({
   );
 
   useEffect(() => {
+    setDir(1);
     setActive(0);
     setTick((t) => t + 1);
   }, [filter]);
 
   const count = items.length;
   const item = items[active] ?? items[0];
+  const accent = item ? CAT_COLOR[item.category] : CAT_COLOR.all;
+
+  const select = useCallback(
+    (i: number) => {
+      setDir(i >= active ? 1 : -1);
+      setActive(i);
+      setTick((t) => t + 1);
+      setPaused(true);
+    },
+    [active]
+  );
 
   const go = useCallback(
     (d: 1 | -1) => {
@@ -93,13 +118,21 @@ export function CaseSystem({
       setTick((t) => t + 1);
     }, HOLD_MS);
     return () => window.clearInterval(id);
-  }, [paused, reduce, count, active]);
+  }, [paused, reduce, count]);
+
+  // Depth stack: current + next unique cases
+  const stack = useMemo(() => {
+    const out: PortfolioItem[] = [];
+    for (let o = 0; o < Math.min(3, count); o++) {
+      const it = items[(active + o) % count];
+      if (it && !out.some((x) => x.id === it.id)) out.push(it);
+    }
+    return out;
+  }, [items, active, count]);
 
   if (!item) return null;
 
   const caseNo = portfolio.findIndex((p) => p.id === item.id) + 1 || active + 1;
-  const prevItem = items[(active - 1 + count) % count];
-  const nextItem = items[(active + 1) % count];
 
   return (
     <Section
@@ -107,47 +140,93 @@ export function CaseSystem({
       contained={false}
     >
       <div
-        className="pf-kinetic relative flex h-full min-h-0 w-full flex-col overflow-hidden"
+        className="pf-atelier relative flex h-full min-h-0 w-full flex-col overflow-hidden"
+        style={
+          {
+            ["--pa"]: accent,
+            ["--pa-soft"]: `${accent}33`,
+          } as CSSProperties
+        }
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* Dynamic ambient from active cover */}
+        {/* Ambient — soft crossfade with case */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-0 bg-[#0c0a08]" />
-          <AmbientBg
-            key={item.id}
-            src={item.cover}
-            candidates={item.coverCandidates}
-            gradient={item.gradient}
+          <div className="absolute inset-0 bg-[#0a0610]" />
+          <div className="absolute inset-0 overflow-hidden">
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={`amb-${item.id}`}
+                className="absolute inset-0"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={{ duration: FADE_MS * 1.1, ease: fadeEase }}
+              >
+                <AmbientBg
+                  src={item.cover}
+                  candidates={item.coverCandidates}
+                  gradient={item.gradient}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a0610]/80 via-[#12081a]/78 to-[#080610]/88" />
+          <motion.div
+            className="absolute -left-[15%] top-[-10%] h-[55%] w-[50%] blur-3xl opacity-80"
+            animate={{
+              background: `radial-gradient(circle, ${accent}30, transparent 70%)`,
+            }}
+            transition={{ duration: FADE_MS, ease: fadeEase }}
           />
-          <div className="absolute inset-0 bg-[#0c0a08]/75" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_55%_40%,rgba(251,191,36,0.12),transparent_60%)]" />
+          <div
+            className="absolute -right-[10%] bottom-[-5%] h-[45%] w-[40%] blur-3xl opacity-60"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(163,230,53,0.12), transparent 70%)",
+            }}
+          />
+          <div className="pf-atelier__grid absolute inset-0" />
+          <div className="pf-atelier__noise absolute inset-0 opacity-[0.04]" />
         </div>
 
         <Container className="relative z-10 flex h-full min-h-0 w-full max-w-none flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-          {/* Header */}
+          {/* Header — exhibition style */}
           <header className="flex shrink-0 flex-wrap items-end justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.75)]" />
+                <span
+                  className="pf-atelier__dot h-1.5 w-1.5 rounded-full"
+                  style={{ background: accent, boxShadow: `0 0 12px ${accent}` }}
+                />
                 <p className="text-[11px] font-medium tracking-[0.22em] text-white/40 uppercase">
-                  07 · {locale === "de" ? "Kinetic works" : "Kinetic works"}
+                  07 · {locale === "de" ? "Atelier" : "Atelier"}
                 </p>
               </div>
-              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              <h2 className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-0 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {dict.home.portfolioTitle}
+                <span
+                  className="font-mono text-sm font-normal tracking-wider tabular-nums sm:text-base"
+                  style={{ color: accent }}
+                >
+                  {String(caseNo).padStart(2, "0")}
+                  <span className="text-white/25">
+                    /{String(portfolio.length).padStart(2, "0")}
+                  </span>
+                </span>
               </h2>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {/* Filters */}
+              {/* Category as color chips */}
               <div
-                className="inline-flex flex-wrap gap-0.5 rounded-sm border border-white/[0.1] bg-black/40 p-0.5 backdrop-blur-sm"
+                className="flex flex-wrap gap-1"
                 role="tablist"
                 aria-label={locale === "de" ? "Kategorie" : "Danh mục"}
               >
                 {CATEGORIES.map((c) => {
                   const on = filter === c.key;
+                  const col = CAT_COLOR[c.key];
                   return (
                     <button
                       key={c.key}
@@ -156,12 +235,25 @@ export function CaseSystem({
                       aria-selected={on}
                       onClick={() => setFilter(c.key)}
                       className={cn(
-                        "px-2.5 py-1.5 text-[11px] font-medium tracking-wide transition-colors sm:text-xs",
+                        "pf-atelier__cat inline-flex items-center gap-1.5 border px-2.5 py-1.5 text-[11px] font-semibold tracking-wide uppercase transition-all sm:text-xs",
                         on
-                          ? "bg-amber-400 text-black"
-                          : "text-white/50 hover:bg-white/[0.06] hover:text-white/85"
+                          ? "text-black"
+                          : "border-white/10 bg-black/30 text-white/50 hover:border-white/20 hover:text-white/85"
                       )}
+                      style={
+                        on
+                          ? {
+                              background: col,
+                              borderColor: col,
+                              boxShadow: `0 0 20px ${col}44`,
+                            }
+                          : { borderColor: `${col}28` }
+                      }
                     >
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ background: on ? "#000" : col }}
+                      />
                       {c.label[locale]}
                     </button>
                   );
@@ -177,9 +269,14 @@ export function CaseSystem({
                 className={cn(
                   "flex h-9 w-9 items-center justify-center border transition-colors",
                   paused
-                    ? "border-amber-400/50 bg-amber-400/15 text-amber-300"
-                    : "border-white/15 text-white/55 hover:border-amber-400/40 hover:text-amber-200"
+                    ? "border-white/30 bg-white/10 text-white"
+                    : "border-white/12 text-white/50 hover:border-white/25 hover:text-white"
                 )}
+                style={
+                  paused
+                    ? { borderColor: `${accent}66`, color: accent }
+                    : undefined
+                }
                 aria-label={paused ? "Play" : "Pause"}
               >
                 {paused ? (
@@ -191,7 +288,8 @@ export function CaseSystem({
 
               <Link
                 href={localePath(locale, "/portfolio")}
-                className="group hidden items-center gap-1.5 border border-white/12 bg-black/30 px-3 py-2 text-sm text-white/60 transition-colors hover:border-amber-400/40 hover:text-amber-200 sm:inline-flex"
+                className="group hidden items-center gap-1.5 border border-white/12 bg-black/35 px-3 py-2 text-sm text-white/60 transition-colors hover:text-white sm:inline-flex"
+                style={{ borderColor: `${accent}33` }}
               >
                 {dict.common.viewAll}
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -199,235 +297,35 @@ export function CaseSystem({
             </div>
           </header>
 
-          {/* Kinetic stage */}
-          <div className="relative mt-3 min-h-0 flex-1">
-            <div className="pf-kinetic__stage relative flex h-full min-h-0 overflow-hidden border border-white/[0.1] bg-black/40">
-              {/* Peek prev / next (desktop) */}
-              {prevItem && count > 1 && (
-                <button
-                  type="button"
-                  onClick={() => go(-1)}
-                  className="pf-kinetic__peek pf-kinetic__peek--prev absolute top-0 bottom-0 left-0 z-[5] hidden w-[4.5rem] items-stretch lg:flex"
-                  aria-label="Previous case"
-                >
-                  <span className="relative my-3 ml-2 w-full overflow-hidden border border-white/10 opacity-40 transition-opacity hover:opacity-80">
-                    <SmartImage
-                      src={prevItem.cover}
-                      candidates={prevItem.coverCandidates}
-                      alt=""
-                      gradient={prevItem.gradient}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <span className="absolute inset-0 bg-black/50" />
-                  </span>
-                </button>
-              )}
-              {nextItem && count > 1 && (
-                <button
-                  type="button"
-                  onClick={() => go(1)}
-                  className="pf-kinetic__peek pf-kinetic__peek--next absolute top-0 bottom-0 right-0 z-[5] hidden w-[4.5rem] items-stretch lg:flex"
-                  aria-label="Next case"
-                >
-                  <span className="relative my-3 mr-2 w-full overflow-hidden border border-white/10 opacity-40 transition-opacity hover:opacity-80">
-                    <SmartImage
-                      src={nextItem.cover}
-                      candidates={nextItem.coverCandidates}
-                      alt=""
-                      gradient={nextItem.gradient}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <span className="absolute inset-0 bg-black/50" />
-                  </span>
-                </button>
-              )}
-
-              <AnimatePresence mode="wait" custom={dir}>
-                <motion.div
-                  key={item.id}
-                  custom={dir}
-                  initial={
-                    reduce
-                      ? { opacity: 0 }
-                      : { opacity: 0, x: dir > 0 ? 48 : -48, scale: 1.03 }
-                  }
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={
-                    reduce
-                      ? { opacity: 0 }
-                      : { opacity: 0, x: dir > 0 ? -36 : 36, scale: 0.99 }
-                  }
-                  transition={{ duration: 0.45, ease }}
-                  className="absolute inset-0"
-                >
-                  <SmartImage
-                    src={item.cover}
-                    candidates={item.coverCandidates}
-                    alt={t(item.title, locale)}
-                    gradient={item.gradient}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                  {/* Kinetic overlays */}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/30" />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25" />
-                  <div className="pf-kinetic__scan pointer-events-none absolute inset-0" />
-
-                  {/* Giant index */}
-                  <span
-                    className="pointer-events-none absolute top-2 right-4 select-none font-mono text-[5rem] font-semibold leading-none tracking-tighter text-white/[0.08] sm:top-3 sm:right-6 sm:text-[7rem]"
-                    aria-hidden
-                  >
-                    {String(caseNo).padStart(2, "0")}
-                  </span>
-
-                  {/* Content HUD */}
-                  <div className="absolute inset-0 z-[2] flex flex-col justify-between p-4 sm:p-5 lg:px-20 lg:py-6">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="bg-amber-400 px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-black uppercase">
-                        {item.category}
-                      </span>
-                      <span className="border border-white/15 bg-black/40 px-2.5 py-1 font-mono text-[10px] text-white/70 capitalize backdrop-blur-sm">
-                        {item.industry}
-                      </span>
-                      <span className="font-mono text-[11px] tabular-nums text-white/40">
-                        {String(active + 1).padStart(2, "0")} /{" "}
-                        {String(count).padStart(2, "0")}
-                      </span>
-                    </div>
-
-                    <div className="max-w-xl">
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-white/50">
-                        <span className="inline-flex items-center gap-1.5 text-amber-300/90">
-                          <Clock3 className="h-3.5 w-3.5" />
-                          {t(item.duration, locale)}
-                        </span>
-                        <span className="hidden h-3 w-px bg-white/15 sm:block" />
-                        <span className="inline-flex max-w-xs items-center gap-1.5 truncate">
-                          <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-400" />
-                          <span className="truncate">{t(item.result, locale)}</span>
-                        </span>
-                      </div>
-
-                      <h3 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-[2.1rem] md:leading-tight">
-                        {t(item.title, locale)}
-                      </h3>
-                      <p className="mt-2 line-clamp-2 max-w-lg text-sm leading-relaxed text-white/60 sm:text-[15px]">
-                        {t(item.description, locale)}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {item.tags.slice(0, 4).map((tag) => (
-                          <span
-                            key={tag}
-                            className="border border-white/12 bg-white/[0.05] px-2 py-0.5 text-[11px] text-white/55 backdrop-blur-sm"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Before → After kinetic line */}
-                      <div className="mt-4 hidden items-stretch gap-0 sm:flex">
-                        <div className="min-w-0 flex-1 border border-white/10 bg-black/35 px-3 py-2 backdrop-blur-sm">
-                          <p className="font-mono text-[9px] tracking-wider text-white/35 uppercase">
-                            {dict.common.before}
-                          </p>
-                          <p className="mt-0.5 truncate text-xs text-white/55">
-                            {t(item.beforeLabel, locale)}
-                          </p>
-                        </div>
-                        <div className="flex w-8 shrink-0 items-center justify-center bg-amber-400/15">
-                          <ArrowRight className="h-3.5 w-3.5 text-amber-400" />
-                        </div>
-                        <div className="min-w-0 flex-1 border border-amber-400/30 bg-amber-400/10 px-3 py-2 backdrop-blur-sm">
-                          <p className="font-mono text-[9px] tracking-wider text-amber-400/90 uppercase">
-                            {dict.common.after}
-                          </p>
-                          <p className="mt-0.5 truncate text-xs text-white/80">
-                            {t(item.afterLabel, locale)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => go(-1)}
-                          className="flex h-10 w-10 items-center justify-center border border-white/15 bg-black/40 text-white/70 backdrop-blur-sm transition-colors hover:border-white/30 hover:text-white"
-                          aria-label="Previous"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => go(1)}
-                          className="flex h-10 w-10 items-center justify-center border border-white/15 bg-black/40 text-white/70 backdrop-blur-sm transition-colors hover:border-white/30 hover:text-white"
-                          aria-label="Next"
-                        >
-                          <ArrowRight className="h-4 w-4" />
-                        </button>
-
-                        {/* Auto progress */}
-                        <div className="mx-1 hidden h-0.5 min-w-[5rem] flex-1 overflow-hidden bg-white/10 sm:block sm:max-w-[10rem]">
-                          {!reduce && !paused && count > 1 ? (
-                            <motion.div
-                              key={tick}
-                              className="h-full bg-amber-400"
-                              initial={{ width: "0%" }}
-                              animate={{ width: "100%" }}
-                              transition={{
-                                duration: HOLD_MS / 1000,
-                                ease: "linear",
-                              }}
-                            />
-                          ) : (
-                            <div className="h-full w-1/4 bg-amber-400/50" />
-                          )}
-                        </div>
-
-                        <Link
-                          href={localePath(locale, `/portfolio/${item.id}`)}
-                          className="inline-flex min-h-10 items-center gap-1.5 bg-amber-400 px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-                        >
-                          {dict.common.viewProject}
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Dynamic filmstrip — equal cases */}
-          <div className="mt-3 shrink-0">
+          {/* Main atelier stage */}
+          <div className="mt-3 grid min-h-0 flex-1 gap-3 lg:grid-cols-12 lg:gap-4">
+            {/* ── Vertical film spine ── */}
             <nav
-              className="pf-kinetic__strip grid w-full gap-1.5 sm:gap-2"
+              className="pf-atelier__spine no-scrollbar flex shrink-0 gap-1.5 overflow-x-auto lg:col-span-2 lg:flex-col lg:gap-1.5 lg:overflow-y-auto lg:overflow-x-hidden"
               aria-label="Cases"
-              style={{
-                gridTemplateColumns: `repeat(${Math.max(count, 1)}, minmax(0, 1fr))`,
-              }}
             >
               {items.map((p, i) => {
                 const on = i === active;
                 const n = portfolio.findIndex((x) => x.id === p.id) + 1;
+                const col = CAT_COLOR[p.category];
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => {
-                      setDir(i > active ? 1 : -1);
-                      setActive(i);
-                      setTick((t) => t + 1);
-                      setPaused(true);
-                    }}
+                    onClick={() => select(i)}
                     className={cn(
-                      "pf-kinetic__thumb group relative flex min-h-[3.25rem] w-full min-w-0 overflow-hidden border transition-all duration-300 sm:min-h-[4rem]",
+                      "pf-atelier__frame group relative flex min-w-[4.5rem] shrink-0 flex-col overflow-hidden border transition-all duration-300 sm:min-w-[5.25rem] lg:min-h-0 lg:min-w-0 lg:w-full lg:flex-1 lg:max-h-[5.5rem]",
                       on
-                        ? "border-amber-400 z-[1] scale-[1.02] shadow-[0_8px_28px_rgba(251,191,36,0.2)]"
-                        : "border-white/10 opacity-70 hover:opacity-100 hover:border-white/25"
+                        ? "border-transparent z-[1]"
+                        : "border-white/10 opacity-65 hover:opacity-100 hover:border-white/25"
                     )}
+                    style={
+                      on
+                        ? {
+                            boxShadow: `0 0 0 1.5px ${col}, 0 10px 28px ${col}30`,
+                          }
+                        : undefined
+                    }
                     aria-current={on ? "true" : undefined}
                     title={t(p.title, locale)}
                   >
@@ -440,16 +338,37 @@ export function CaseSystem({
                     />
                     <span
                       className={cn(
-                        "absolute inset-0 transition-colors",
+                        "absolute inset-0",
                         on
-                          ? "bg-gradient-to-t from-black/90 via-black/30 to-transparent"
-                          : "bg-black/45 group-hover:bg-black/30"
+                          ? "bg-gradient-to-t from-black/85 via-black/25 to-transparent"
+                          : "bg-black/50 group-hover:bg-black/35"
                       )}
                     />
-                    {on && !reduce && !paused && (
+                    {/* film sprocket marks */}
+                    <span className="pf-atelier__sprocket absolute inset-y-1 left-0.5 flex flex-col justify-between" aria-hidden>
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span className="relative z-[1] mt-auto flex w-full items-end justify-between gap-1 p-1.5">
+                      <span
+                        className="font-mono text-[10px] font-bold tabular-nums"
+                        style={{ color: on ? col : "rgba(255,255,255,0.55)" }}
+                      >
+                        {String(n).padStart(2, "0")}
+                      </span>
+                      <span
+                        className="hidden truncate text-[9px] font-medium uppercase tracking-wide text-white/70 lg:block"
+                        style={{ color: on ? col : undefined }}
+                      >
+                        {p.category}
+                      </span>
+                    </span>
+                    {on && !reduce && !paused && count > 1 && (
                       <motion.span
-                        key={`bar-${tick}-${p.id}`}
-                        className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-amber-400"
+                        key={`prog-${tick}-${p.id}`}
+                        className="absolute inset-x-0 bottom-0 h-0.5 origin-left"
+                        style={{ background: col }}
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
                         transition={{
@@ -458,27 +377,359 @@ export function CaseSystem({
                         }}
                       />
                     )}
-                    <span className="relative z-[1] mt-auto flex w-full items-end justify-between gap-1 p-1.5 sm:p-2">
-                      <span
-                        className={cn(
-                          "font-mono text-[9px] tabular-nums",
-                          on ? "text-amber-300" : "text-white/50"
-                        )}
-                      >
-                        {String(n).padStart(2, "0")}
-                      </span>
-                      <span className="hidden truncate text-right text-[10px] font-medium text-white/80 sm:block">
-                        {t(p.title, locale).split("—")[0]?.trim()}
-                      </span>
-                    </span>
                   </button>
                 );
               })}
             </nav>
+
+            {/* ── Center: angled media stack ── */}
+            <div className="relative min-h-0 lg:col-span-6 xl:col-span-7">
+              <div className="pf-atelier__stage relative h-full min-h-[240px] overflow-hidden sm:min-h-[280px]">
+                {/* Depth cards — fade/slide gently */}
+                {!reduce &&
+                  stack.slice(1).map((s, i) => (
+                    <motion.div
+                      key={`stack-${s.id}`}
+                      className="pf-atelier__depth pointer-events-none absolute inset-0 overflow-hidden border border-white/10"
+                      initial={false}
+                      animate={{
+                        x: (i + 1) * 10,
+                        y: (i + 1) * 8,
+                        scale: 1 - (i + 1) * 0.04,
+                        opacity: 0.32 - i * 0.1,
+                      }}
+                      transition={{ duration: FADE_MS, ease: fadeEase }}
+                      style={{ zIndex: 1 - i }}
+                    >
+                      <SmartImage
+                        src={s.cover}
+                        candidates={s.coverCandidates}
+                        alt=""
+                        gradient={s.gradient}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                      <span className="absolute inset-0 bg-black/50" />
+                    </motion.div>
+                  ))}
+
+                {/* Static shell keeps clip-path stable; images crossfade inside */}
+                <div
+                  className="pf-atelier__hero relative z-[2] h-full min-h-[240px] overflow-hidden border border-white/15 sm:min-h-[280px]"
+                  style={{
+                    boxShadow: `0 0 0 1px ${accent}22, 0 28px 70px rgba(0,0,0,0.5)`,
+                  }}
+                >
+                  <AnimatePresence initial={false} custom={dir}>
+                    <motion.div
+                      key={item.id}
+                      custom={dir}
+                      variants={{
+                        enter: (d: 1 | -1) =>
+                          reduce
+                            ? { opacity: 0 }
+                            : {
+                                opacity: 0,
+                                x: d * 28,
+                                scale: 1.03,
+                              },
+                        center: {
+                          opacity: 1,
+                          x: 0,
+                          scale: 1,
+                        },
+                        exit: (d: 1 | -1) =>
+                          reduce
+                            ? { opacity: 0 }
+                            : {
+                                opacity: 0,
+                                x: d * -18,
+                                scale: 1.015,
+                              },
+                      }}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{
+                        duration: FADE_MS,
+                        ease: fadeEase,
+                        opacity: { duration: FADE_MS * 0.85, ease: fadeEase },
+                      }}
+                      className="pf-atelier__slide absolute inset-0"
+                    >
+                      {/* Ken Burns settle on enter */}
+                      <motion.div
+                        className="absolute inset-0 will-change-transform"
+                        initial={reduce ? false : { scale: 1.07 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          duration: reduce ? 0 : 1.15,
+                          ease: fadeEase,
+                        }}
+                      >
+                        <SmartImage
+                          src={item.cover}
+                          candidates={item.coverCandidates}
+                          alt={t(item.title, locale)}
+                          gradient={item.gradient}
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      </motion.div>
+
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/30" />
+                      <div
+                        className="pointer-events-none absolute inset-0 transition-[background] duration-500"
+                        style={{
+                          background: `linear-gradient(125deg, ${accent}28 0%, transparent 45%, rgba(163,230,53,0.08) 100%)`,
+                        }}
+                      />
+                      <div className="pf-atelier__cut pointer-events-none absolute inset-0" />
+
+                      <span
+                        className="pointer-events-none absolute -right-2 -bottom-4 select-none font-mono text-[7rem] font-black leading-none tracking-tighter text-white/[0.07] sm:text-[9rem] lg:text-[11rem]"
+                        aria-hidden
+                      >
+                        {String(caseNo).padStart(2, "0")}
+                      </span>
+
+                      <div className="absolute top-3 left-3 z-[3] flex flex-wrap items-center gap-1.5 sm:top-4 sm:left-4">
+                        <span
+                          className="px-2.5 py-1 font-mono text-[10px] font-bold tracking-wider text-black uppercase"
+                          style={{ background: accent }}
+                        >
+                          {item.category}
+                        </span>
+                        <span className="border border-white/20 bg-black/50 px-2.5 py-1 font-mono text-[10px] text-white/75 capitalize backdrop-blur-sm">
+                          {item.industry}
+                        </span>
+                      </div>
+
+                      <div className="absolute right-3 bottom-3 z-[3] flex gap-1.5 sm:right-4 sm:bottom-4">
+                        <button
+                          type="button"
+                          onClick={() => go(-1)}
+                          className="flex h-10 w-10 items-center justify-center border border-white/20 bg-black/55 text-white/75 backdrop-blur-md transition-colors hover:border-white/40 hover:text-white"
+                          aria-label="Previous"
+                        >
+                          <span className="font-mono text-xs">←</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => go(1)}
+                          className="flex h-10 w-10 items-center justify-center border border-white/20 bg-black/55 text-white/75 backdrop-blur-md transition-colors hover:border-white/40 hover:text-white"
+                          aria-label="Next"
+                          style={{ borderColor: `${accent}55` }}
+                        >
+                          <span
+                            className="font-mono text-xs"
+                            style={{ color: accent }}
+                          >
+                            →
+                          </span>
+                        </button>
+                      </div>
+
+                      <div className="absolute bottom-3 left-3 z-[3] max-w-[70%] sm:bottom-4 sm:left-4 lg:max-w-[55%]">
+                        <p
+                          className="font-mono text-[10px] tracking-[0.16em] uppercase"
+                          style={{ color: accent }}
+                        >
+                          Case {String(caseNo).padStart(2, "0")}
+                        </p>
+                        <h3 className="mt-0.5 text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl md:text-2xl">
+                          {t(item.title, locale)}
+                        </h3>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Dossier panel ── */}
+            <div className="flex min-h-0 flex-col lg:col-span-4 xl:col-span-3">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.aside
+                  key={item.id}
+                  initial={reduce ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduce ? undefined : { opacity: 0, y: -6 }}
+                  transition={{ duration: FADE_MS * 0.75, ease: fadeEase }}
+                  className="pf-atelier__dossier flex h-full min-h-0 flex-col border border-white/10 bg-black/45"
+                  style={{
+                    boxShadow: `inset 3px 0 0 ${accent}, 0 20px 48px rgba(0,0,0,0.35)`,
+                  }}
+                >
+                  <div className="shrink-0 border-b border-white/[0.07] px-3.5 py-2.5 sm:px-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] text-white/45 uppercase">
+                        <Layers className="h-3.5 w-3.5" style={{ color: accent }} />
+                        {locale === "de" ? "Dossier" : "Hồ sơ case"}
+                      </p>
+                      <span
+                        className="font-mono text-[11px] font-bold tabular-nums"
+                        style={{ color: accent }}
+                      >
+                        {String(active + 1).padStart(2, "0")}/
+                        {String(count).padStart(2, "0")}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3.5 no-scrollbar sm:p-4">
+                    <div>
+                      <h3 className="text-base font-semibold leading-snug tracking-tight text-white sm:text-lg">
+                        {t(item.title, locale)}
+                      </h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-white/52">
+                        {t(item.description, locale)}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <MetaChip
+                        icon={<Clock3 className="h-3.5 w-3.5" style={{ color: accent }} />}
+                        label={locale === "de" ? "Dauer" : "Thời gian"}
+                        value={t(item.duration, locale)}
+                      />
+                      <MetaChip
+                        icon={<Sparkles className="h-3.5 w-3.5" style={{ color: accent }} />}
+                        label={locale === "de" ? "Impact" : "Kết quả"}
+                        value={t(item.result, locale)}
+                      />
+                    </div>
+
+                    {/* Before → After */}
+                    <div className="overflow-hidden border border-white/[0.08]">
+                      <div className="grid grid-cols-[1fr_auto_1fr]">
+                        <div className="bg-white/[0.03] px-2.5 py-2">
+                          <p className="font-mono text-[8px] tracking-wider text-white/35 uppercase">
+                            {dict.common.before}
+                          </p>
+                          <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-white/55">
+                            {t(item.beforeLabel, locale)}
+                          </p>
+                        </div>
+                        <div
+                          className="flex w-7 items-center justify-center"
+                          style={{ background: `${accent}22` }}
+                        >
+                          <ArrowRight
+                            className="h-3.5 w-3.5"
+                            style={{ color: accent }}
+                          />
+                        </div>
+                        <div
+                          className="px-2.5 py-2"
+                          style={{ background: `${accent}12` }}
+                        >
+                          <p
+                            className="font-mono text-[8px] tracking-wider uppercase"
+                            style={{ color: accent }}
+                          >
+                            {dict.common.after}
+                          </p>
+                          <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-white/80">
+                            {t(item.afterLabel, locale)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {item.tags.slice(0, 5).map((tag) => (
+                        <span
+                          key={tag}
+                          className="border px-2 py-0.5 text-[11px] text-white/60"
+                          style={{ borderColor: `${accent}30` }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Materials */}
+                    <div className="border-t border-white/[0.06] pt-2.5">
+                      <p className="font-mono text-[9px] tracking-[0.14em] text-white/35 uppercase">
+                        {dict.common.materials}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/55">
+                        {t(item.materials, locale)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* CTA footer */}
+                  <div className="shrink-0 space-y-2 border-t border-white/[0.07] p-3 sm:p-3.5">
+                    {!reduce && count > 1 && (
+                      <div className="h-0.5 overflow-hidden bg-white/10">
+                        {!paused ? (
+                          <motion.div
+                            key={tick}
+                            className="h-full origin-left"
+                            style={{ background: accent }}
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{
+                              duration: HOLD_MS / 1000,
+                              ease: "linear",
+                            }}
+                          />
+                        ) : (
+                          <div
+                            className="h-full w-1/3 opacity-50"
+                            style={{ background: accent }}
+                          />
+                        )}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        href={localePath(locale, `/portfolio/${item.id}`)}
+                        className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                        style={{
+                          background: accent,
+                          boxShadow: `0 8px 24px ${accent}40`,
+                        }}
+                      >
+                        {dict.common.viewProject}
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={localePath(locale, "/portfolio")}
+                        className="inline-flex min-h-10 items-center justify-center border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white/65 transition-colors hover:border-white/30 hover:text-white"
+                      >
+                        {dict.common.viewAll}
+                      </Link>
+                    </div>
+                  </div>
+                </motion.aside>
+              </AnimatePresence>
+            </div>
           </div>
         </Container>
       </div>
     </Section>
+  );
+}
+
+function MetaChip({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactElement;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="border border-white/[0.07] bg-white/[0.03] px-2.5 py-2">
+      <p className="flex items-center gap-1 font-mono text-[8px] tracking-wider text-white/35 uppercase">
+        {icon}
+        {label}
+      </p>
+      <p className="mt-1 line-clamp-2 text-xs leading-snug text-white/75">{value}</p>
+    </div>
   );
 }
 
@@ -497,7 +748,7 @@ function AmbientBg({
       candidates={candidates}
       alt=""
       gradient={gradient}
-      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-md"
+      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-md"
     />
   );
 }

@@ -28,7 +28,7 @@ export const industries: IndustryItem[] = [
   withMedia("restaurant", {
     icon: "UtensilsCrossed",
     palette: "warm",
-    color: "#f5b041",
+    color: "#ffb020",
     modules: ["branding", "menu", "signage", "website", "gmb", "marketing"],
     title: { vi: "Nhà hàng / F&B", de: "Restaurant / F&B" },
     short: {
@@ -140,7 +140,7 @@ export const industries: IndustryItem[] = [
   withMedia("nail", {
     icon: "Sparkles",
     palette: "rose",
-    color: "#ff6bb5",
+    color: "#ff3d9a",
     modules: ["branding", "menu", "signage", "booking", "gmb", "marketing"],
     title: { vi: "Nail Studio", de: "Nagelstudio" },
     short: {
@@ -252,7 +252,7 @@ export const industries: IndustryItem[] = [
   withMedia("salon", {
     icon: "Scissors",
     palette: "soft",
-    color: "#c77dff",
+    color: "#c026ff",
     modules: ["branding", "print", "wayfinding", "website", "marketing"],
     title: { vi: "Salon / Spa", de: "Salon / Spa" },
     short: {
@@ -364,7 +364,7 @@ export const industries: IndustryItem[] = [
   withMedia("shop", {
     icon: "ShoppingBag",
     palette: "cool",
-    color: "#3dc4ff",
+    color: "#22d3ee",
     modules: ["branding", "cnc", "signage", "website", "marketing"],
     title: { vi: "Shop / Retail", de: "Shop / Retail" },
     short: {
@@ -476,7 +476,7 @@ export const industries: IndustryItem[] = [
   withMedia("dental", {
     icon: "HeartPulse",
     palette: "clinical",
-    color: "#2ee6c8",
+    color: "#34d399",
     modules: ["branding", "wayfinding", "print", "website", "gmb"],
     title: { vi: "Nha khoa / Praxis", de: "Zahnarztpraxis" },
     short: {
@@ -588,7 +588,7 @@ export const industries: IndustryItem[] = [
   withMedia("logistics", {
     icon: "Truck",
     palette: "industrial",
-    color: "#8b95ff",
+    color: "#818cf8",
     modules: ["branding", "wrap", "website", "print", "marketing"],
     title: { vi: "Logistics / Fleet", de: "Logistik / Flotte" },
     short: {
@@ -700,7 +700,7 @@ export const industries: IndustryItem[] = [
   withMedia("enterprise", {
     icon: "Building2",
     palette: "graphite",
-    color: "#a8b8d0",
+    color: "#a78bfa",
     modules: ["branding", "website", "print", "marketing", "cnc"],
     title: { vi: "Doanh nghiệp / SME", de: "Unternehmen / KMU" },
     short: {

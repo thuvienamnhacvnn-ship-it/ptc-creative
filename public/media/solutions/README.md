@@ -1,33 +1,31 @@
-﻿# Solutions media — Giải pháp theo ngành
+# Solutions media — Giải pháp theo ngành
 
-**Path máy:** `C:\Users\admin\ptc-creative\public\media\solutions\{slug}\`  
+**Path:** `C:\Users\admin\ptc-creative\public\media\solutions\{slug}\`  
 **URL:** `/media/solutions/{slug}/...`
 
 ## Folders (slug)
 
-| Folder | Ngành | Màu gợi ý |
-|--------|-------|-----------|
-| restaurant | Nhà hàng / F&B | #f5b041 |
-| nail | Nail | #ff6bb5 |
-| salon | Salon | #c77dff |
-| shop | Shop / Retail | #3dc4ff |
-| dental | Dental | #2ee6c8 |
-| logistics | Logistics | #8b95ff |
-| enterprise | Enterprise | #a8b8d0 |
+| Folder | File cover hiện có | Ngành |
+|--------|-------------------|--------|
+| `restaurant/` | `restaurant.png` | Nhà hàng / F&B |
+| `nail/` | `nail.png` | Nail |
+| `salon/` | `salon.png` | Salon |
+| `shop/` | `shop.png` | Shop / Retail |
+| `dental/` | `dental.png` | Dental |
+| `logistics/` | `logistics.png` | Logistics |
+| `enterprise/` | `enterprise.png` | Enterprise |
 
-## Files mỗi folder
+## Naming (ưu tiên code)
 
-```
-cover.jpg | cover.png     ★ cover chính
-1.jpg … 6.jpg             ★ gallery
-hero.mp4 | demo.mp4       ★ video (optional)
-process.mp4
-poster.jpg                # poster video
-```
+| File | Mô tả |
+|------|--------|
+| `{slug}.png` | ★ Cover chính (đang dùng) |
+| `{slug}.jpg` / `.webp` | Cover alternate |
+| `cover.png` | Cover alias |
+| `1.png` … `6.png` | Gallery |
+| `hero.mp4` | Video (optional) |
+| `poster.jpg` | Poster video |
 
-## Fallback
+## Code
 
-Chưa có file → site dùng ảnh demo từ `public/media/services/*`  
-(branding, cnc, printing, website, werbetechnik, marketing).
-
-Code: `src/data/industry-media.ts`
+`src/data/industry-media.ts` — probe theo thứ tự trên; thiếu file → fallback `public/media/services/*`.

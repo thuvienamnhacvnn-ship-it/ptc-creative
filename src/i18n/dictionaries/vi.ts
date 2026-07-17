@@ -252,6 +252,13 @@ export type Dictionary = {
     note: string;
     popular: string;
     cta: string;
+    modulesLabel: string;
+    driversLabel: string;
+    fromLabel: string;
+    selectedLabel: string;
+    scopeLabel: string;
+    compareAll: string;
+    refLabel: string;
   };
   blog: {
     badge: string;
@@ -572,7 +579,7 @@ export const vi: Dictionary = {
       "Câu chuyện studio, đội ngũ production–design–growth và quy trình từ brief đến launch.",
     blogTitle: "Blog & kiến thức vận hành",
     blogSubtitle:
-      "Marketing, thuế, doanh nghiệp và kinh nghiệm kinh doanh tại Đức — góc nhìn thực chiến.",
+      "Ghi chú thực chiến cho SME tại Đức: marketing, thuế, brand và vận hành local.",
     teamTitle: "Hệ thống nhân sự",
     teamSubtitle:
       "Mr. Phú · Mr. Tuyên · Mr. Chung — core team Berlin. Bấm Play để xem video hồ sơ.",
@@ -679,32 +686,43 @@ export const vi: Dictionary = {
     },
   },
   pricing: {
-    badge: "Modules",
+    badge: "Pricing",
     title: "Giá tham khảo theo module",
-    subtitle: "Minh bạch phạm vi. Báo giá chính thức phụ thuộc vật liệu, scope và tiến độ.",
-    note: "Mọi gói có thể cấu hình trong Project Lab. Báo giá chi tiết trong 24–48h.",
-    popular: "Recommended",
+    subtitle:
+      "Bảng giá định hướng theo từng năng lực PTC. Số liệu “từ” — báo giá chính thức sau khi chốt brief, vật liệu và tiến độ.",
+    note: "Báo giá chi tiết trong 24–48 giờ làm việc. Phạm vi, vật liệu và lắp đặt có thể làm thay đổi mức giá cuối.",
+    popular: "Khuyến nghị",
     cta: "Yêu cầu báo giá",
+    modulesLabel: "Chọn module",
+    driversLabel: "Yếu tố giá",
+    fromLabel: "Giá từ",
+    selectedLabel: "Đang chọn",
+    scopeLabel: "Phạm vi",
+    compareAll: "Xem đầy đủ",
+    refLabel: "Richtpreis",
   },
   blog: {
-    badge: "Blog",
+    badge: "Knowledge",
     title: "Kiến thức vận hành & growth",
-    subtitle: "Marketing, thuế, doanh nghiệp và kinh nghiệm kinh doanh tại Đức.",
+    subtitle:
+      "Bài viết ngắn, thực dụng — từ khai trương cửa hàng, Google Ads local đến checklist web & biển hiệu tại Đức.",
     featured: "Nổi bật",
     allPosts: "Tất cả bài viết",
     categoriesLabel: "Chủ đề",
   },
   faq: {
     badge: "FAQ",
-    title: "Câu hỏi vận hành",
-    subtitle: "Timeline, vật liệu, bảo hành, báo giá — trả lời thẳng.",
-    stillTitle: "Cần brief nhanh?",
-    stillCta: "Mở AI Assistant",
+    title: "Câu hỏi thường gặp",
+    subtitle:
+      "Timeline, vật liệu, bảo hành, báo giá và lắp đặt — trả lời thẳng, lọc theo chủ đề.",
+    stillTitle: "Chưa thấy câu trả lời?",
+    stillCta: "Hỏi AI Assistant",
   },
   contact: {
     badge: "Project brief",
     title: "Bắt đầu dự án với PTC",
-    subtitle: "Gửi tín hiệu — chúng tôi phản hồi trong giờ làm việc với hướng stack sơ bộ.",
+    subtitle:
+      "Gửi brief — team Berlin phản hồi trong giờ làm việc với hướng stack và bước tiếp theo.",
     formName: "Họ và tên",
     formEmail: "Email",
     formPhone: "Điện thoại",
@@ -716,12 +734,12 @@ export const vi: Dictionary = {
     formSuccessDesc: "Cảm ơn bạn. Team sẽ liên hệ với hướng tiếp theo.",
     formError: "Vui lòng điền các trường bắt buộc.",
     formSelectService: "Chọn module",
-    infoTitle: "Contact channel",
+    infoTitle: "Kênh liên hệ",
     infoEmail: "Email",
-    infoPhone: "Phone",
-    infoAddress: "Address",
-    infoHours: "Hours",
-    mapPlaceholder: "Map placeholder — Berlin / DE coverage",
+    infoPhone: "Điện thoại",
+    infoAddress: "Địa điểm",
+    infoHours: "Giờ làm việc",
+    mapPlaceholder: "Berlin / Đức — coverage toàn quốc",
   },
   auth: {
     loginTitle: "Đăng nhập Workspace",

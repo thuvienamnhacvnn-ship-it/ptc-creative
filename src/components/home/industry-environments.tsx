@@ -108,7 +108,7 @@ export function IndustryEnvironments({
 
   const current = industries.find((i) => i.slug === slug) ?? industries[0]!;
   const media = useMemo(() => industryMedia(current.slug), [current.slug]);
-  const accent = current.color ?? "#2ee6c8";
+  const accent = current.color ?? "#22d3ee";
   const solutions = (current.solutions ?? []).slice(0, 4);
   const outcomes = tList(current.outcomes, locale).slice(0, 2);
   const modules = current.modules.slice(0, 5);
@@ -136,25 +136,40 @@ export function IndustryEnvironments({
           } as CSSProperties
         }
       >
-        {/* Ambient */}
+        {/* Ambient — multi-hue electric */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-0 bg-[#041210]" />
+          <div className="absolute inset-0 bg-[#070b18]" />
           <AmbientCover candidates={media.coverCandidates} accent={accent} />
-          <div className="absolute inset-0 bg-[#041210]/74" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#070b18]/70 via-[#0a1224]/78 to-[#0c0a1a]/82" />
           <div
-            className="absolute -right-[10%] top-[-8%] h-[65%] w-[50%] opacity-90 blur-3xl transition-[background] duration-700"
+            className="absolute -right-[8%] top-[-6%] h-[58%] w-[48%] opacity-95 blur-3xl transition-[background] duration-700"
             style={{
-              background: `radial-gradient(circle, ${accent}2a, transparent 68%)`,
+              background: `radial-gradient(circle, ${accent}38, transparent 68%)`,
             }}
           />
           <div
-            className="absolute -left-[6%] bottom-[-4%] h-[40%] w-[38%] opacity-70 blur-3xl transition-[background] duration-700"
+            className="absolute -left-[10%] top-[8%] h-[42%] w-[36%] opacity-70 blur-3xl"
             style={{
-              background: `radial-gradient(circle, ${accent}16, transparent 70%)`,
+              background:
+                "radial-gradient(circle, rgba(34,211,238,0.22), transparent 70%)",
             }}
           />
-          <div className="ind-prism__grid absolute inset-0 opacity-[0.06]" />
-          <div className="ind-prism__scanline absolute inset-x-0 top-0 h-px opacity-40" />
+          <div
+            className="absolute bottom-[-8%] left-[20%] h-[38%] w-[42%] opacity-60 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(192,38,211,0.18), transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute right-[10%] bottom-[5%] h-[32%] w-[30%] opacity-55 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(251,113,133,0.16), transparent 70%)",
+            }}
+          />
+          <div className="ind-prism__grid absolute inset-0" />
+          <div className="ind-prism__scanline absolute inset-x-0 top-0" />
         </div>
 
         <Container className="relative z-10 flex h-full min-h-0 w-full max-w-none flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
@@ -212,11 +227,11 @@ export function IndustryEnvironments({
                     accent={accent}
                   />
 
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/88 via-black/28 to-black/35" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#070b18]/92 via-[#0a1224]/40 to-[#0c0a1a]/45" />
                   <div
-                    className="pointer-events-none absolute inset-0 opacity-90 transition-[background] duration-500"
+                    className="pointer-events-none absolute inset-0 opacity-95 transition-[background] duration-500"
                     style={{
-                      background: `linear-gradient(115deg, ${accent}36 0%, transparent 42%, transparent 58%, rgba(0,0,0,0.38) 100%)`,
+                      background: `linear-gradient(118deg, ${accent}42 0%, transparent 40%, rgba(168,85,247,0.12) 62%, rgba(7,11,24,0.45) 100%)`,
                     }}
                   />
                   <div className="ind-prism__slash pointer-events-none absolute inset-y-0 right-[28%] w-px sm:right-[32%]" />
@@ -259,8 +274,8 @@ export function IndustryEnvironments({
 
                   <div className="absolute inset-x-3 bottom-3 z-[2] sm:inset-x-auto sm:left-4 sm:right-auto sm:bottom-4 sm:w-[min(100%,24rem)]">
                     <div
-                      className="ind-prism__glass border border-white/15 bg-black/58 p-3.5 backdrop-blur-md sm:p-4"
-                      style={{ borderColor: `${accent}42` }}
+                      className="ind-prism__glass border p-3.5 sm:p-4"
+                      style={{ borderColor: `${accent}55` }}
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span
@@ -310,12 +325,7 @@ export function IndustryEnvironments({
 
             {/* Giải pháp chuyên sâu */}
             <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
-              <div
-                className="ind-deep flex min-h-0 flex-1 flex-col overflow-hidden border border-white/[0.09] bg-black/40"
-                style={{
-                  boxShadow: `inset 0 1px 0 ${accent}14, 0 18px 48px rgba(0,0,0,0.3)`,
-                }}
-              >
+              <div className="ind-deep flex min-h-0 flex-1 flex-col overflow-hidden border">
                 {/* Panel header */}
                 <div className="ind-deep__head shrink-0 border-b border-white/[0.07] px-3.5 py-3 sm:px-4">
                   <div className="flex items-center justify-between gap-2">
@@ -734,7 +744,7 @@ function CoverImage({
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(145deg, ${accent}45, #0a1412 72%)`,
+            background: `linear-gradient(145deg, ${accent}50, #0a1224 72%)`,
           }}
         />
       }

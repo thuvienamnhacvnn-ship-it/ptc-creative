@@ -1,14 +1,6 @@
-﻿# Industry media — nail
+﻿# nail media
 
-Drop illustration files here for **Giải pháp theo ngành / nail**.
+Cover: `nail.png` (primary)
+URL: `/media/solutions/nail/nail.png`
 
-| File | Role |
-|------|------|
-| `cover.jpg` (or .png / .webp) | Hero cover |
-| `1.jpg` … `4.jpg` | Gallery stills |
-| `hero.mp4` (or demo.mp4 / process.mp4) | Demo / process video |
-| `poster.jpg` | Video poster |
-
-Public URL base: `/media/solutions/nail/`
-
-Component probes candidates automatically if a file is missing.
+Optional: cover.png, 1–6.png, hero.mp4, poster.jpg

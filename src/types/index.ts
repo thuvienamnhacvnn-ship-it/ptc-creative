@@ -114,11 +114,24 @@ export interface PricingTier {
   description: LocalizedString;
   features: LocalizedStringArray;
   highlighted?: boolean;
+  /** Typical delivery window for this tier */
+  timeline?: LocalizedString;
+  /** Ideal client / use case */
+  bestFor?: LocalizedString;
 }
 
 export interface PricingCategory {
   id: string;
   title: LocalizedString;
+  /** One-line module pitch */
+  short: LocalizedString;
+  icon: string;
+  /** Accent hex for UI */
+  color: string;
+  /** What moves the final quote */
+  drivers?: LocalizedStringArray;
+  /** Module-level scope note */
+  scopeNote?: LocalizedString;
   tiers: PricingTier[];
 }
 
