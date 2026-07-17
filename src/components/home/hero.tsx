@@ -118,7 +118,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const accentSet = new Set(h.heroTitleAccent.split(" "));
 
   return (
-    <section className="relative h-full min-h-0 w-full overflow-hidden bg-[#03060d] text-white">
+    <section className="relative h-full min-h-0 w-full overflow-hidden bg-transparent text-white">
       <div className="banner-stage h-full min-h-0 w-full max-h-none">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div

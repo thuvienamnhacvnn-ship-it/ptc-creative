@@ -113,11 +113,6 @@ export function HomeStory({
     >
       <Container className="flex h-full min-h-0 w-full max-w-none flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5">
         <div className="story-atelier relative flex min-h-0 flex-1 flex-col">
-          <div className="pointer-events-none absolute inset-0" aria-hidden>
-            <div className="absolute left-[8%] top-[12%] h-36 w-36 rounded-full bg-amber-500/[0.05] blur-3xl" />
-            <div className="absolute bottom-[10%] right-[15%] h-40 w-40 rounded-full bg-orange-600/[0.04] blur-3xl" />
-          </div>
-
           {/* Meta */}
           <div className="relative z-10 mb-3 flex shrink-0 items-center justify-between gap-3 sm:mb-4">
             <div className="flex items-center gap-3">

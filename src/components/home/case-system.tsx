@@ -150,46 +150,6 @@ export function CaseSystem({
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* Ambient — soft crossfade with case */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-0 bg-[#0a0610]" />
-          <div className="absolute inset-0 overflow-hidden">
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={`amb-${item.id}`}
-                className="absolute inset-0"
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={reduce ? undefined : { opacity: 0 }}
-                transition={{ duration: FADE_MS * 1.1, ease: fadeEase }}
-              >
-                <AmbientBg
-                  src={item.cover}
-                  candidates={item.coverCandidates}
-                  gradient={item.gradient}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0a0610]/80 via-[#12081a]/78 to-[#080610]/88" />
-          <motion.div
-            className="absolute -left-[15%] top-[-10%] h-[55%] w-[50%] blur-3xl opacity-80"
-            animate={{
-              background: `radial-gradient(circle, ${accent}30, transparent 70%)`,
-            }}
-            transition={{ duration: FADE_MS, ease: fadeEase }}
-          />
-          <div
-            className="absolute -right-[10%] bottom-[-5%] h-[45%] w-[40%] blur-3xl opacity-60"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(163,230,53,0.12), transparent 70%)",
-            }}
-          />
-          <div className="pf-atelier__grid absolute inset-0" />
-          <div className="pf-atelier__noise absolute inset-0 opacity-[0.04]" />
-        </div>
-
         <Container className="relative z-10 flex h-full min-h-0 w-full max-w-none flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           {/* Header — exhibition style */}
           <header className="flex shrink-0 flex-wrap items-end justify-between gap-3">
@@ -554,7 +514,7 @@ export function CaseSystem({
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduce ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: FADE_MS * 0.75, ease: fadeEase }}
-                  className="pf-atelier__dossier flex h-full min-h-0 flex-col border border-white/10 bg-black/45"
+                  className="pf-atelier__dossier flex h-full min-h-0 flex-col border border-white/10 bg-transparent"
                   style={{
                     boxShadow: `inset 3px 0 0 ${accent}, 0 20px 48px rgba(0,0,0,0.35)`,
                   }}
@@ -730,26 +690,6 @@ function MetaChip({
       </p>
       <p className="mt-1 line-clamp-2 text-xs leading-snug text-white/75">{value}</p>
     </div>
-  );
-}
-
-function AmbientBg({
-  src,
-  candidates,
-  gradient,
-}: {
-  src?: string;
-  candidates?: string[];
-  gradient: string;
-}) {
-  return (
-    <SmartImage
-      src={src}
-      candidates={candidates}
-      alt=""
-      gradient={gradient}
-      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-md"
-    />
   );
 }
 

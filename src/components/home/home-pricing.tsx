@@ -41,24 +41,6 @@ export function HomePricing({
         className="px-board relative flex h-full min-h-0 w-full flex-col overflow-hidden"
         style={{ ["--px"]: accent } as CSSProperties}
       >
-        {/* Ambient — subtle professional */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-0 bg-[#080c14]" />
-          <div
-            className="absolute inset-x-0 top-0 h-px opacity-60"
-            style={{
-              background: `linear-gradient(90deg, transparent, ${accent}55, transparent)`,
-            }}
-          />
-          <div
-            className="absolute left-1/2 top-0 h-[40%] w-[60%] -translate-x-1/2 blur-3xl opacity-50"
-            style={{
-              background: `radial-gradient(ellipse, ${accent}14, transparent 70%)`,
-            }}
-          />
-          <div className="px-board__grid absolute inset-0 opacity-[0.04]" />
-        </div>
-
         <Container className="relative z-10 flex h-full min-h-0 w-full max-w-none flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           {/* Header */}
           <header className="flex shrink-0 flex-wrap items-start justify-between gap-3">
@@ -95,7 +77,7 @@ export function HomePricing({
 
           {/* Module selector — professional segment control */}
           <div
-            className="mt-4 flex shrink-0 gap-0 overflow-x-auto border border-white/[0.08] bg-black/40 p-0.5 no-scrollbar"
+            className="mt-4 flex shrink-0 gap-0 overflow-x-auto border border-white/[0.08] bg-transparent p-0.5 no-scrollbar"
             role="tablist"
             aria-label={dict.pricing.modulesLabel}
           >
@@ -173,16 +155,15 @@ export function HomePricing({
                     <article
                       key={tier.id}
                       className={cn(
-                        "px-board__card relative flex min-h-0 flex-col border bg-[#0c111c]/90 p-4 sm:p-5",
+                        "px-board__card relative flex min-h-0 flex-col border p-4 sm:p-5",
                         hot
-                          ? "border-white/15"
-                          : "border-white/[0.07]"
+                          ? "border-white/18 bg-white/[0.04]"
+                          : "border-white/[0.08] bg-transparent"
                       )}
                       style={
                         hot
                           ? {
-                              borderColor: `${accent}50`,
-                              boxShadow: `inset 0 1px 0 ${accent}22, 0 16px 40px rgba(0,0,0,0.35)`,
+                              borderColor: `${accent}45`,
                             }
                           : undefined
                       }

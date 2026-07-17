@@ -153,7 +153,7 @@ export function FaqAccordion({
                   board
                     ? open
                       ? "border-white/15 bg-white/[0.06]"
-                      : "border-white/[0.07] bg-black/30 hover:border-white/12 hover:bg-white/[0.03]"
+                      : "border-white/[0.07] bg-transparent hover:border-white/12 hover:bg-white/[0.03]"
                     : open
                       ? "border-border bg-card shadow-sm"
                       : "border-border bg-card/80 hover:border-foreground/15"
@@ -338,7 +338,7 @@ function CatChip({
         active
           ? "text-black"
           : board
-            ? "border-white/10 bg-black/30 text-white/50 hover:border-white/20 hover:text-white/80"
+            ? "border-white/10 bg-transparent text-white/50 hover:border-white/20 hover:text-white/80"
             : "border-border bg-card text-muted hover:border-foreground/20 hover:text-foreground"
       )}
       style={

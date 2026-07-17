@@ -353,6 +353,14 @@ export function HomeSnapRoot({
 
   return (
     <div className="home-snap-root">
+      {/* Shared space void — same as §12, fixed so every section feels continuous */}
+      <div className="home-space-void" aria-hidden>
+        <div className="home-space-void__base" />
+        <div className="home-space-void__nebula" />
+        <div className="home-space-void__stars" />
+        <div className="home-space-void__grid" />
+      </div>
+
       <div
         ref={scrollerRef}
         className="home-snap-scroller"
@@ -450,15 +458,8 @@ export function HomeStage({
         className
       )}
     >
-      {/* Soft luminous ambient — no grain / scan / noisy grids */}
-      <div className="home-theme-decor" aria-hidden data-decor={decorId}>
-        <span className="home-theme-decor__wash" />
-        <span className="home-theme-decor__glow home-theme-decor__glow--a" />
-        <span className="home-theme-decor__glow home-theme-decor__glow--b" />
-        <span className="home-theme-decor__glow home-theme-decor__glow--c" />
-        <span className="home-theme-decor__beam" />
-        <span className="home-theme-decor__veil" />
-      </div>
+      {/* Per-section color decor removed — shared home-space-void is the only bg */}
+      <div className="home-theme-decor" aria-hidden data-decor={decorId} />
 
       {index && (
         <span className="home-theme-index" aria-hidden>

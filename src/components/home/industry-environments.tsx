@@ -136,42 +136,6 @@ export function IndustryEnvironments({
           } as CSSProperties
         }
       >
-        {/* Ambient — multi-hue electric */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-0 bg-[#070b18]" />
-          <AmbientCover candidates={media.coverCandidates} accent={accent} />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#070b18]/70 via-[#0a1224]/78 to-[#0c0a1a]/82" />
-          <div
-            className="absolute -right-[8%] top-[-6%] h-[58%] w-[48%] opacity-95 blur-3xl transition-[background] duration-700"
-            style={{
-              background: `radial-gradient(circle, ${accent}38, transparent 68%)`,
-            }}
-          />
-          <div
-            className="absolute -left-[10%] top-[8%] h-[42%] w-[36%] opacity-70 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(34,211,238,0.22), transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute bottom-[-8%] left-[20%] h-[38%] w-[42%] opacity-60 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(192,38,211,0.18), transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute right-[10%] bottom-[5%] h-[32%] w-[30%] opacity-55 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(251,113,133,0.16), transparent 70%)",
-            }}
-          />
-          <div className="ind-prism__grid absolute inset-0" />
-          <div className="ind-prism__scanline absolute inset-x-0 top-0" />
-        </div>
-
         <Container className="relative z-10 flex h-full min-h-0 w-full max-w-none flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           {/* Header */}
           <header className="flex shrink-0 items-end justify-between gap-3">
@@ -681,48 +645,6 @@ export function IndustryEnvironments({
         </Container>
       </div>
     </Section>
-  );
-}
-
-function AmbientCover({
-  candidates,
-  accent,
-}: {
-  candidates: string[];
-  accent: string;
-}) {
-  const [idx, setIdx] = useState(0);
-  const [failed, setFailed] = useState(candidates.length === 0);
-  const src = !failed && candidates[idx] ? candidates[idx] : null;
-
-  useEffect(() => {
-    setIdx(0);
-    setFailed(candidates.length === 0);
-  }, [candidates]);
-
-  if (!src) {
-    return (
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          background: `linear-gradient(135deg, ${accent}40, transparent 60%)`,
-        }}
-      />
-    );
-  }
-
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      key={src}
-      src={src}
-      alt=""
-      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-sm"
-      onError={() => {
-        if (idx + 1 < candidates.length) setIdx((i) => i + 1);
-        else setFailed(true);
-      }}
-    />
   );
 }
 

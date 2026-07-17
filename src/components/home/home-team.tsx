@@ -215,7 +215,7 @@ export function HomeTeam({ locale, dict }: { locale: Locale; dict: Dictionary })
               </div>
 
               {/* Profile panel */}
-              <div className="flex min-h-0 min-w-0 flex-col border border-white/10 bg-white/[0.02] lg:col-span-7 xl:col-span-8">
+              <div className="flex min-h-0 min-w-0 flex-col border border-white/10 bg-transparent lg:col-span-7 xl:col-span-8">
                 <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4 no-scrollbar sm:space-y-3.5 sm:p-5">
                   {member.focus && (
                     <p className="text-base font-medium leading-snug text-violet-200/90 sm:text-lg">

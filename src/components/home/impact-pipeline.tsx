@@ -271,7 +271,7 @@ export function ImpactPipeline({
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduce ? undefined : { opacity: 0, y: -6 }}
                   transition={{ duration: 0.32, ease }}
-                  className="proc-flow__panel flex h-full min-h-0 flex-col overflow-hidden border border-white/[0.1] bg-black/35"
+                  className="proc-flow__panel flex h-full min-h-0 flex-col overflow-hidden border border-white/[0.1] bg-transparent"
                   style={
                     {
                       boxShadow: `0 0 0 1px ${color}22, 0 24px 60px rgba(0,0,0,0.35)`,

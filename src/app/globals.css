@@ -1627,7 +1627,7 @@ body.home-snap-mode {
 
 body.home-snap-mode {
   background-image: none;
-  background-color: #03060d;
+  background-color: #000;
 }
 
 /* Hide site footer/chrome scroll while fullpage home is active */
@@ -1642,6 +1642,79 @@ body.home-snap-mode footer {
   width: 100%;
   height: calc(100dvh - var(--home-header-h, 4rem));
   min-height: calc(100dvh - var(--home-header-h, 4rem));
+  background: #000;
+}
+
+/*
+ * Shared space void — clone of §12 CTA background.
+ * Fixed once behind the scroller so all 12 sections feel continuous.
+ * Static only: no filter/glow/animation (perf).
+ */
+.home-space-void {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--home-header-h, 4rem);
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #000;
+}
+.home-space-void__base {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+.home-space-void__nebula {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 40% at 30% 28%, rgba(70, 40, 140, 0.18), transparent 62%),
+    radial-gradient(ellipse 45% 35% at 72% 60%, rgba(120, 40, 20, 0.1), transparent 60%),
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba(0, 0, 0, 0.85), transparent 55%);
+}
+.home-space-void__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-repeat: repeat;
+  background-size: 280px 280px;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 160px 50px, rgba(210, 220, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 220px 180px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 40px 200px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 200px 40px, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(1px 1px at 130px 220px, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 250px 100px, rgba(220, 230, 255, 0.75), transparent),
+    radial-gradient(1px 1px at 60px 70px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 180px 150px, rgba(255, 255, 255, 0.4), transparent);
+}
+.home-space-void__grid {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 42%;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 56px,
+      rgba(120, 140, 200, 0.04) 56px,
+      rgba(120, 140, 200, 0.04) 57px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 56px,
+      rgba(255, 77, 0, 0.03) 56px,
+      rgba(255, 77, 0, 0.03) 57px
+    );
+  opacity: 0.7;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 35%, #000 100%);
 }
 
 /* Exact full-frame scroller — CSS snap + JS lock */
@@ -1660,6 +1733,8 @@ body.home-snap-mode footer {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  /* transparent so shared void shows through */
+  background: transparent;
   /* hide scrollbar — navigation via dots / wheel */
   scrollbar-width: none;
 }
@@ -1689,21 +1764,71 @@ body.home-snap-mode footer {
   container-type: size;
   padding: 0;
   border: none;
+  background: transparent !important;
+  background-image: none !important;
   background-clip: border-box;
 }
 
+/* Kill per-section colored themes / private frames — void only */
+.home-snap-scroller .home-snap-section,
+.home-snap-scroller .home-snap-section[class*="home-theme-"],
+.home-snap-scroller [class*="home-theme-"] {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+.home-snap-scroller .home-theme-decor,
+.home-snap-scroller .home-theme-decor * {
+  display: none !important;
+}
+.home-snap-scroller .home-theme-index {
+  opacity: 0.04;
+  color: rgba(180, 160, 255, 0.45);
+}
+
+/* Neutralize legacy theme palette blocks (kept for class hooks only) */
+.home-theme-hero,
+.home-theme-story,
+.home-theme-team,
+.home-theme-process,
+.home-theme-services,
+.home-theme-solutions,
+.home-theme-portfolio,
+.home-theme-pricing,
+.home-theme-blog,
+.home-theme-faq,
+.home-theme-contact,
+.home-theme-cta {
+  background: transparent !important;
+  background-image: none !important;
+  color: #fff;
+}
+
+/* No private stage boards / fills on home content shells */
+.home-snap-scroller .story-atelier,
+.home-snap-scroller .team-section,
+.home-snap-scroller .proc-flow,
+.home-snap-scroller .svc-spectrum,
+.home-snap-scroller .ind-prism,
+.home-snap-scroller .pf-atelier,
+.home-snap-scroller .px-board,
+.home-snap-scroller .blog-board,
+.home-snap-scroller .faq-board,
+.home-snap-scroller .contact-board,
+.home-snap-scroller .cta-v3d {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
 .home-snap-section--bleed {
-  /* keep flex center so bleed canvas sits at 85% (not edge-to-edge) */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
 }
 
-/*
- * Layout canvas default = full section.
- * Các section (trừ banner) thu nhỏ 15% qua :not(.home-theme-hero).
- */
+/* Layout canvas — scaled via --home-stage-scale on sections */
 .home-snap-stage,
 .home-snap-bleed {
   position: relative;
@@ -1727,40 +1852,54 @@ body.home-snap-mode footer {
   backdrop-filter: none !important;
 }
 
-/* Thu nhỏ 15% — mọi section trừ Banner (hero) */
-.home-snap-section:not(.home-theme-hero) {
-  display: flex;
+/*
+ * Layout canvas — thu gọn (~85%), căn giữa.
+ * Không khung nền: transparent, không bo góc, không shadow.
+ * Banner (hero) full-bleed để media không bị cắt.
+ */
+.home-snap-section,
+.home-snap-section.home-snap-section--bleed {
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  padding: 0 !important;
 }
-.home-snap-section:not(.home-theme-hero) .home-snap-stage,
-.home-snap-section:not(.home-theme-hero) .home-snap-bleed {
+.home-snap-section .home-snap-bleed,
+.home-snap-section .home-snap-stage {
   --home-stage-scale: 0.85;
-  width: calc(100% * var(--home-stage-scale));
-  height: calc(100% * var(--home-stage-scale));
-  max-width: calc(100% * var(--home-stage-scale));
-  max-height: calc(100% * var(--home-stage-scale));
-  margin: 0 auto;
-  border-radius: 0.25rem;
+  width: calc(100% * var(--home-stage-scale)) !important;
+  height: calc(100% * var(--home-stage-scale)) !important;
+  max-width: calc(100% * var(--home-stage-scale)) !important;
+  max-height: calc(100% * var(--home-stage-scale)) !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
-
-/* Banner home — full màn hình edge-to-edge */
-.home-snap-section.home-theme-hero,
-.home-snap-section.home-theme-hero.home-snap-section--bleed {
+/* Banner full canvas */
+.home-snap-section.home-theme-hero {
   display: block !important;
   align-items: stretch;
   justify-content: stretch;
-  padding: 0 !important;
 }
 .home-snap-section.home-theme-hero .home-snap-bleed,
 .home-snap-section.home-theme-hero .home-snap-stage {
+  --home-stage-scale: 1;
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
   max-height: 100% !important;
   min-height: 100% !important;
   margin: 0 !important;
-  border-radius: 0 !important;
+}
+.home-snap-section .home-theme-decor {
+  display: none !important;
+}
+.home-snap-section .home-theme-index {
+  opacity: 0.04;
+  color: rgba(180, 160, 255, 0.4);
 }
 
 .home-snap-stage > *,
@@ -2011,14 +2150,16 @@ body.home-snap-mode footer {
   .home-snap-root {
     height: calc(100dvh - var(--home-header-h, 3.25rem) - 3.5rem);
   }
-  /* Mobile: non-hero 85%; hero always full */
-  .home-snap-section:not(.home-theme-hero) .home-snap-stage,
-  .home-snap-section:not(.home-theme-hero) .home-snap-bleed {
-    --home-stage-scale: 0.85;
-    width: calc(100% * var(--home-stage-scale));
-    height: calc(100% * var(--home-stage-scale));
-    max-width: calc(100% * var(--home-stage-scale));
-    max-height: calc(100% * var(--home-stage-scale));
+  /* Mobile: thu gọn (88%) */
+  .home-snap-section .home-snap-bleed,
+  .home-snap-section .home-snap-stage {
+    --home-stage-scale: 0.88;
+    width: calc(100% * var(--home-stage-scale)) !important;
+    height: calc(100% * var(--home-stage-scale)) !important;
+    max-width: calc(100% * var(--home-stage-scale)) !important;
+    max-height: calc(100% * var(--home-stage-scale)) !important;
+    margin: 0 auto !important;
+    border-radius: 0 !important;
   }
   .home-snap-section.home-theme-hero .home-snap-bleed,
   .home-snap-section.home-theme-hero .home-snap-stage {
@@ -2026,6 +2167,7 @@ body.home-snap-mode footer {
     height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
+    margin: 0 !important;
   }
 }
 
@@ -2206,10 +2348,8 @@ body.home-snap-mode footer {
   width: 100%;
 }
 .story-atelier__photo {
-  background: #0a0806;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 18px 40px rgba(0, 0, 0, 0.32);
+  background: transparent;
+  box-shadow: none;
   /* Ảnh chiếm full ô — không bị co bởi max-width wrapper */
   width: 100%;
   min-height: 0;
@@ -3419,42 +3559,25 @@ body.home-snap-mode footer {
   mask-image: radial-gradient(ellipse 72% 68% at 50% 42%, #000 18%, transparent 78%);
 }
 
-/* ---- THEME: BLOG — indigo dusk editorial ---- */
-.home-theme-blog {
-  background:
-    radial-gradient(ellipse 52% 48% at 18% 25%, rgba(129, 140, 248, 0.16), transparent 55%),
-    radial-gradient(ellipse 40% 38% at 85% 72%, rgba(244, 114, 182, 0.1), transparent 52%),
-    radial-gradient(ellipse 30% 28% at 50% 90%, rgba(52, 211, 153, 0.06), transparent 50%),
-    linear-gradient(155deg, #0a0c14 0%, #10141f 48%, #090b12 100%);
-}
-.home-theme-blog .home-theme-decor__glow--a {
-  background: rgba(129, 140, 248, 0.36);
-}
-.home-theme-blog .home-theme-decor__glow--b {
-  background: rgba(244, 114, 182, 0.2);
-}
-.home-theme-blog .home-theme-decor__glow--c {
-  background: rgba(167, 139, 250, 0.14);
+/* ---- THEME: BLOG / FAQ / CONTACT / CTA — transparent on shared void ---- */
+.home-theme-blog,
+.home-theme-faq,
+.home-theme-contact,
+.home-theme-cta {
+  background: transparent !important;
 }
 
-/* Blog knowledge board (home) */
-.blog-board {
+.blog-board,
+.faq-board,
+.contact-board {
   height: 100%;
   min-height: 0;
 }
-.blog-board__grid {
-  background-image:
-    linear-gradient(rgba(129, 140, 248, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(244, 114, 182, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 72% 68% at 48% 42%, #000 16%, transparent 76%);
-}
 .blog-board__featured {
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color 0.2s ease;
 }
 .blog-board__featured:hover {
-  border-color: color-mix(in srgb, var(--ba, #818cf8) 35%, rgba(255, 255, 255, 0.12));
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+  border-color: color-mix(in srgb, var(--ba, #818cf8) 30%, rgba(255, 255, 255, 0.1));
 }
 .blog-board__row:focus-visible,
 .blog-board [role="tab"]:focus-visible {
@@ -3462,35 +3585,6 @@ body.home-snap-mode footer {
   outline-offset: 2px;
 }
 
-/* ---- THEME: FAQ — soft indigo ---- */
-.home-theme-faq {
-  background:
-    radial-gradient(ellipse 55% 48% at 20% 20%, rgba(129, 140, 248, 0.16), transparent 55%),
-    radial-gradient(ellipse 45% 40% at 85% 75%, rgba(56, 189, 248, 0.1), transparent 52%),
-    linear-gradient(175deg, #090b14 0%, #0c0f1a 50%, #080a12 100%);
-}
-.home-theme-faq .home-theme-decor__glow--a {
-  background: rgba(129, 140, 248, 0.38);
-}
-.home-theme-faq .home-theme-decor__glow--b {
-  background: rgba(56, 189, 248, 0.22);
-}
-.home-theme-faq .home-theme-decor__glow--c {
-  background: rgba(160, 170, 255, 0.12);
-}
-
-/* FAQ board (home) */
-.faq-board {
-  height: 100%;
-  min-height: 0;
-}
-.faq-board__grid {
-  background-image:
-    linear-gradient(rgba(129, 140, 248, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 72% 68% at 50% 42%, #000 16%, transparent 76%);
-}
 .faq-acc--board {
   min-height: 0;
 }
@@ -3502,39 +3596,6 @@ body.home-snap-mode footer {
   outline-offset: 2px;
 }
 
-/* ---- THEME: CONTACT — emerald / sky ---- */
-.home-theme-contact {
-  background:
-    radial-gradient(ellipse 52% 48% at 18% 28%, rgba(52, 211, 153, 0.16), transparent 56%),
-    radial-gradient(ellipse 42% 38% at 88% 70%, rgba(14, 165, 233, 0.12), transparent 54%),
-    linear-gradient(160deg, #061412 0%, #07161a 50%, #050f14 100%);
-}
-.home-theme-contact .home-theme-decor__glow--a {
-  background: rgba(52, 211, 153, 0.36);
-  left: 8%;
-  right: auto;
-}
-.home-theme-contact .home-theme-decor__glow--b {
-  background: rgba(14, 165, 233, 0.28);
-  left: auto;
-  right: 4%;
-}
-.home-theme-contact .home-theme-decor__glow--c {
-  background: rgba(100, 230, 200, 0.12);
-}
-
-/* Contact board (home) */
-.contact-board {
-  height: 100%;
-  min-height: 0;
-}
-.contact-board__grid {
-  background-image:
-    linear-gradient(rgba(52, 211, 153, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 165, 233, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 72% 68% at 50% 42%, #000 16%, transparent 76%);
-}
 .contact-board__ping {
   animation: contact-board-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
@@ -3555,21 +3616,52 @@ body.home-snap-mode footer {
   }
 }
 
-/* ---- THEME: CTA — warm signal ---- */
-.home-theme-cta {
-  background:
-    radial-gradient(ellipse 75% 60% at 50% 45%, rgba(255, 77, 0, 0.24), transparent 60%),
-    radial-gradient(ellipse 40% 35% at 20% 80%, rgba(255, 140, 0, 0.12), transparent 50%),
-    linear-gradient(160deg, #1a0c06 0%, #0c0808 50%, #140a06 100%);
+/* CTA content (home uses shared void; standalone pages keep dark base) */
+.cta-v3d {
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  position: relative;
+  color: #fff;
+  contain: layout paint style;
+  background-color: #000;
+  background-image:
+    radial-gradient(ellipse 50% 40% at 30% 28%, rgba(70, 40, 140, 0.18), transparent 62%),
+    radial-gradient(ellipse 45% 35% at 72% 60%, rgba(120, 40, 20, 0.1), transparent 60%),
+    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 160px 50px, rgba(210, 220, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 220px 180px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 40px 200px, rgba(255, 255, 255, 0.35), transparent);
+  background-size:
+    auto,
+    auto,
+    280px 280px,
+    280px 280px,
+    280px 280px,
+    280px 280px,
+    280px 280px;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, repeat, repeat;
 }
-.home-theme-cta .home-theme-decor__glow--a {
-  background: rgba(255, 90, 30, 0.5);
+.home-snap-scroller .cta-v3d {
+  background: transparent !important;
+  background-image: none !important;
 }
-.home-theme-cta .home-theme-decor__glow--b {
-  background: rgba(255, 150, 50, 0.28);
+.cta-v3d__title {
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
 }
-.home-theme-cta .home-theme-decor__glow--c {
-  background: rgba(255, 120, 60, 0.16);
+.cta-v3d__btn {
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.cta-v3d__btn--primary {
+  box-shadow: 0 8px 24px rgba(255, 77, 0, 0.28);
+}
+.cta-v3d__btn--primary:hover {
+  box-shadow: 0 10px 28px rgba(255, 77, 0, 0.38);
+}
+.cta-v3d__foot {
+  padding-top: 0.25rem;
 }
 
 /* Stage / bleed children fill the 85% canvas (not the full viewport) */
